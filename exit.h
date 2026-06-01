@@ -7,6 +7,7 @@ extern uint8_t system_enabled;
 extern uint8_t auto_mode;
 extern uint8_t function_mode;
 
+
 void exit_init(void);
 
 #endif
