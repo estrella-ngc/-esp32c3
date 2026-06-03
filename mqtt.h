@@ -15,7 +15,9 @@ extern char mqtt_pass[32];
 
 void mqtt_init(void);
 void mqtt_update(void);
+uint8_t mqtt_client_connected(void);
 void mqtt_publish_status(void);
+void mqtt_request_publish(void);
 void mqtt_save_config(void);
 void mqtt_disconnect(void);
 void mqtt_forget_config(void);

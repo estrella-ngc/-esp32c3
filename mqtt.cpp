@@ -4,6 +4,7 @@
 #include "tmp.h"
 #include "led.h"
 #include "relay.h"
+#include "tasks.h"
 #include "wifi_manager.h"
 #include <WiFi.h>
 #include <PubSubClient.h>
@@ -20,6 +21,7 @@ static PubSubClient client(wifi_client);
 static char status_topic[64];
 static char cmd_topic[64];
 static unsigned long last_publish = 0;
+static volatile uint8_t publish_requested = 0;
 static uint8_t initialized = 0;
 
 static void rebuild_topics(void)
@@ -80,6 +82,7 @@ static void callback(char* topic, byte* payload, unsigned int length)
       adc_save_threshold();
       Serial.printf("[MQTT] 设置光照阈值 = %d (ADC: %d)\r\n", val, light_threshold);
     }
+    mqtt_request_publish();
   } else if (strcmp(cmd, "reboot") == 0) {
     Serial.println("[MQTT] 收到重启命令");
     delay(100);
@@ -112,6 +115,16 @@ static void load_config(void)
   }
 
   prefs.end();
+}
+
+uint8_t mqtt_client_connected(void)
+{
+  return client.connected();
+}
+
+void mqtt_request_publish(void)
+{
+  publish_requested = 1;
 }
 
 void mqtt_save_config(void)
@@ -226,7 +239,40 @@ void mqtt_update(void)
 
   client.loop();
 
-  if (millis() - last_publish >= 5000) {
+  static uint8_t prev_enabled = 0;
+  static uint8_t prev_auto = 1;
+  static uint8_t prev_fn = 0;
+  static uint8_t prev_led = 0;
+  static uint8_t prev_relay = 0;
+
+  uint8_t cur_enabled, cur_auto, cur_fn;
+  portENTER_CRITICAL(&shared_mux);
+  cur_enabled = system_enabled;
+  cur_auto = auto_mode;
+  cur_fn = function_mode;
+  portEXIT_CRITICAL(&shared_mux);
+
+  uint8_t cur_led = digitalRead(LED_PIN);
+  uint8_t cur_relay = digitalRead(RELAY_PIN);
+
+  uint8_t changed = (prev_enabled != cur_enabled || prev_auto != cur_auto ||
+                     prev_fn != cur_fn || prev_led != cur_led || prev_relay != cur_relay);
+  if (changed) {
+    prev_enabled = cur_enabled;
+    prev_auto = cur_auto;
+    prev_fn = cur_fn;
+    prev_led = cur_led;
+    prev_relay = cur_relay;
+  }
+
+  if (publish_requested) {
+    publish_requested = 0;
+    last_publish = millis();
+    mqtt_publish_status();
+  } else if (changed) {
+    last_publish = millis();
+    mqtt_publish_status();
+  } else if (millis() - last_publish >= 5000) {
     last_publish = millis();
     mqtt_publish_status();
   }

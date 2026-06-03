@@ -4,6 +4,7 @@
 #include "tmp.h"
 #include "led.h"
 #include "relay.h"
+#include "mqtt.h"
 #include "wifi_manager.h"
 #include <WebServer.h>
 #include <WiFi.h>
@@ -33,12 +34,14 @@ static void handle_system(void)
 {
   system_enabled = !system_enabled;
   if (!system_enabled) { LED(LOW); relay_control(LOW); }
+  mqtt_request_publish();
   handle_status();
 }
 
 static void handle_mode(void)
 {
   auto_mode = !auto_mode;
+  mqtt_request_publish();
   handle_status();
 }
 
@@ -48,6 +51,7 @@ static void handle_function(void)
     int m = server.arg("mode").toInt();
     if (m >= 0 && m <= 3) function_mode = m;
   }
+  mqtt_request_publish();
   handle_status();
 }
 
@@ -56,6 +60,7 @@ static void handle_led(void)
   if (server.hasArg("state")) {
     LED(server.arg("state").toInt() ? HIGH : LOW);
   }
+  mqtt_request_publish();
   handle_status();
 }
 
@@ -64,6 +69,7 @@ static void handle_fan(void)
   if (server.hasArg("state")) {
     relay_control(server.arg("state").toInt() ? HIGH : LOW);
   }
+  mqtt_request_publish();
   handle_status();
 }
 

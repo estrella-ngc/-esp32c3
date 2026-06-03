@@ -10,6 +10,7 @@
 #include "mqtt.h"
 #include "wifi_manager.h"
 #include "web_ui.h"
+#include "tasks.h"
 
 #define LONG_PRESS_THRESHOLD 2000
 
@@ -108,6 +109,7 @@ void setup() {
     Serial.print("网页控制: http://");
     Serial.println(wifi_get_ip());
   }
+  tasks_init();
   Serial.println("初始化完成");
   Serial.println("输入 help 查看命令");
 }
@@ -116,22 +118,11 @@ void loop() {
   handle_key1();
   handle_key2();
   handle_serial();
-  update_outputs();
   read_light_sensor();
   read_temperature();
-  wifi_update();
+  update_outputs();
   web_update();
   oled_update();
-
-  if (system_enabled) {
-    if (wifi_is_connected()) {
-      rgb_led_set(0, 80, 0);
-    } else {
-      rgb_led_set(80, 0, 0);
-    }
-  } else {
-    rgb_led_off();
-  }
 
   if (system_enabled && auto_mode) {
     static unsigned long t = 0;
@@ -149,8 +140,6 @@ void loop() {
     }
   }
 
-  mqtt_update();
-
   delay(10);
 }
 
@@ -162,6 +151,7 @@ void handle_key1() {
       system_enabled = 1;
       auto_mode = 1;
       function_mode = 0;
+      mqtt_request_publish();
       rgb_led_poweron_flash();
       rgb_led_set(0, 0, 80);
       if (!wifi_is_connected()) {
@@ -176,6 +166,7 @@ void handle_key1() {
   } else {
     if (system_enabled) {
       system_enabled = 0;
+      mqtt_request_publish();
       Serial.println("[总开关] 已关闭");
     }
   }
@@ -195,6 +186,7 @@ void handle_key2() {
     } else {
       if (!long_press_triggered && system_enabled && !auto_mode) {
         function_mode = (function_mode + 1) % 4;
+        mqtt_request_publish();
         Serial.print("[辅助开关] 按下 -> 状态 ");
         Serial.println(function_mode);
       }
@@ -206,6 +198,7 @@ void handle_key2() {
     if (millis() - key2_press_time >= LONG_PRESS_THRESHOLD) {
       long_press_triggered = 1;
       auto_mode = !auto_mode;
+      mqtt_request_publish();
       if (auto_mode) {
         Serial.println("[辅助开关] 长按 2 秒 -> 自动模式（光感控灯）");
       } else {
