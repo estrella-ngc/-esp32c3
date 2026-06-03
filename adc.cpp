@@ -1,5 +1,7 @@
 #include "adc.h"
 
+uint16_t light_threshold = 1800;
+
 static uint16_t light_sensor_value = 0;
 static uint8_t light_sensor_state = 0;
 
@@ -16,9 +18,9 @@ void read_light_sensor(void)
 
   light_sensor_value = analogRead(ADC_PIN);
 
-  if (light_sensor_value > LIGHT_OFF_THRESHOLD) {
+  if (light_sensor_value > light_threshold + 400) {
     light_sensor_state = 1;
-  } else if (light_sensor_value < LIGHT_ON_THRESHOLD) {
+  } else if (light_sensor_value < light_threshold) {
     light_sensor_state = 0;
   }
 }

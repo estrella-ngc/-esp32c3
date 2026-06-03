@@ -5,6 +5,8 @@
 
 #define ONE_WIRE_BUS 10
 
+extern float temp_threshold;
+
 void tmp_init(void);
 void read_temperature(void);
 float get_temperature(void);

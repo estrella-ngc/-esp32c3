@@ -2,8 +2,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#define FAN_ON_TEMP  35.0f
-#define FAN_OFF_TEMP 34.9f
+float temp_threshold = 34.0f;
 
 static OneWire oneWire(ONE_WIRE_BUS);
 static DallasTemperature sensors(&oneWire);
@@ -11,19 +10,31 @@ static float temperature = 0.0f;
 static uint8_t sensor_ok = 0;
 static uint8_t fan_state = 0;
 
+static uint8_t converting = 0;
+static unsigned long convert_start = 0;
+
 void tmp_init(void)
 {
   sensors.begin();
+  sensors.setWaitForConversion(false);
   sensor_ok = 1;
 }
 
 void read_temperature(void)
 {
-  static unsigned long last_read = 0;
-  if (millis() - last_read < 5000) return;
-  last_read = millis();
+  unsigned long now = millis();
 
-  sensors.requestTemperatures();
+  if (!converting) {
+    if (now - convert_start < 5000) return;
+    sensors.requestTemperatures();
+    converting = 1;
+    return;
+  }
+
+  if (!sensors.isConversionComplete()) return;
+
+  converting = 0;
+  convert_start = now;
   temperature = sensors.getTempCByIndex(0);
 
   if (temperature == DEVICE_DISCONNECTED_C) {
@@ -35,9 +46,9 @@ void read_temperature(void)
 
   sensor_ok = 1;
 
-  if (!fan_state && temperature > FAN_ON_TEMP) {
+  if (!fan_state && temperature > temp_threshold) {
     fan_state = 1;
-  } else if (fan_state && temperature < FAN_OFF_TEMP) {
+  } else if (fan_state && temperature < temp_threshold - 0.5f) {
     fan_state = 0;
   }
 }
