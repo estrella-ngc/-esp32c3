@@ -2,8 +2,8 @@
 #define VERSION_H
 #define VERSION "1.0.0"
 
-#define DEVICE_ID "PCT_100_001"
-#define DEVICE_SERIAL "PCT10000300001"
+#define DEVICE_ID "PCT_100_003"
+#define DEVICE_SERIAL "PCT_100_003"
 
 /* 项目信息 */
 #define PROJECT_NAME "LED Controller"

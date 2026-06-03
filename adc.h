@@ -8,6 +8,7 @@
 extern uint16_t light_threshold;
 
 void adc_init(void);
+void adc_save_threshold(void);
 void read_light_sensor(void);
 uint8_t get_light_state(void);
 uint16_t get_adc_value(void);

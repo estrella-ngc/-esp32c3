@@ -1,5 +1,6 @@
 #include "exit.h"
 #include "key.h"
+#include <WiFi.h>
 #include "led.h"
 #include "relay.h"
 #include "adc.h"
@@ -33,16 +34,48 @@ static void handle_serial(void)
         } else {
           Serial.println("格式: connect <ssid> <password>");
         }
-      } else if (strcmp(serial_buf, "ap") == 0) {
-        wifi_start_ap();
-      } else if (strcmp(serial_buf, "ap_stop") == 0) {
-        wifi_stop_ap();
       } else if (strcmp(serial_buf, "forget") == 0) {
         wifi_forget();
       } else if (strcmp(serial_buf, "ip") == 0) {
         wifi_print_info();
       } else if (strcmp(serial_buf, "help") == 0) {
-        Serial.println("命令: scan / connect <ssid> <pass> / ip / ap(\xe5\xbc\x80\xe7\x83\xad\xe7\x82\xb9) / ap_stop(\xe5\x85\xb3\xe7\x83\xad\xe7\x82\xb9) / forget / help");
+        Serial.println("WiFi: scan / connect <ssid> <pass> / ip / forget");
+        Serial.println("MQTT: mqtt_info / connectmqtt / forgetmqtt / mqtt_set <host> <port> <user> <pass> / mqtt_id <id>");
+        Serial.println("      输入 mqtt_set 后自动重连, 配置保存至Flash");
+      } else if (strncmp(serial_buf, "mqtt_set ", 9) == 0) {
+        char host[64], user[32], pass[32];
+        int port;
+        if (sscanf(serial_buf + 9, "%63s %d %31s %31s", host, &port, user, pass) >= 4) {
+          strncpy(mqtt_host, host, sizeof(mqtt_host) - 1);
+          mqtt_port = port;
+          strncpy(mqtt_user, user, sizeof(mqtt_user) - 1);
+          strncpy(mqtt_pass, pass, sizeof(mqtt_pass) - 1);
+          mqtt_save_config();
+          Serial.println("[MQTT] 配置已更新，重新连接...");
+          mqtt_init();
+        } else {
+          Serial.println("格式: mqtt_set <host> <port> <user> <pass>");
+        }
+      } else if (strncmp(serial_buf, "mqtt_id ", 8) == 0) {
+        char id[32];
+        if (sscanf(serial_buf + 8, "%31s", id) >= 1) {
+          strncpy(device_id, id, sizeof(device_id) - 1);
+          exit_save_id();
+          Serial.println("[MQTT] DeviceID已更新，重新连接...");
+          mqtt_init();
+        } else {
+          Serial.println("格式: mqtt_id <device_id>");
+        }
+      } else if (strcmp(serial_buf, "connectmqtt") == 0) {
+        Serial.println("[MQTT] 手动连接...");
+        mqtt_init();
+      } else if (strcmp(serial_buf, "disconnectmqtt") == 0) {
+        mqtt_disconnect();
+      } else if (strcmp(serial_buf, "forgetmqtt") == 0) {
+        mqtt_forget_config();
+        Serial.println("[MQTT] 已断开，下次开机使用默认配置");
+      } else if (strcmp(serial_buf, "mqtt_info") == 0) {
+        mqtt_print_config();
       } else if (serial_buf[0]) {
         Serial.print("未知命令: ");
         Serial.println(serial_buf);
@@ -131,7 +164,10 @@ void handle_key1() {
       function_mode = 0;
       rgb_led_poweron_flash();
       rgb_led_set(0, 0, 80);
-      wifi_reconnect_default();
+      if (!wifi_is_connected()) {
+        Serial.println("[总开关] WiFi未连接，尝试重连...");
+        WiFi.reconnect();
+      }
 
       Serial.println("[总开关] 已开启");
       Serial.println(">>> 模式：自动（光感自动控制灯）");

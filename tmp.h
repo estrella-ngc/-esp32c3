@@ -8,6 +8,7 @@
 extern float temp_threshold;
 
 void tmp_init(void);
+void tmp_save_threshold(void);
 void read_temperature(void);
 float get_temperature(void);
 uint8_t get_fan_state(void);
