@@ -1,5 +1,4 @@
 #include "tasks.h"
-#include "exit.h"
 #include "rgb_led.h"
 #include "wifi_manager.h"
 #include "mqtt.h"
@@ -23,24 +22,8 @@ static void Led_Color_Task(void *pvParameters)
 {
   (void)pvParameters;
   while (1) {
-    uint8_t enabled, connected;
-
-    portENTER_CRITICAL(&shared_mux);
-    enabled = system_enabled;
-    connected = wifi_is_connected();
-    portEXIT_CRITICAL(&shared_mux);
-
-    if (enabled) {
-      if (connected) {
-        rgb_led_set(0, 80, 0);
-      } else {
-        rgb_led_set(80, 0, 0);
-      }
-    } else {
-      rgb_led_off();
-    }
-
-    vTaskDelay(10 / portTICK_PERIOD_MS);
+    rgb_led_task();
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
 }
 

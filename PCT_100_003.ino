@@ -153,7 +153,6 @@ void handle_key1() {
       function_mode = 0;
       mqtt_request_publish();
       rgb_led_poweron_flash();
-      rgb_led_set(0, 0, 80);
       if (!wifi_is_connected()) {
         Serial.println("[总开关] WiFi未连接，尝试重连...");
         WiFi.reconnect();
