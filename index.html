@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PCT-100-003 化工控制实训装置</title>
+<style>
+:root{--navy:#0a1628;--steel:#1a2d4a;--accent:#3b8fc2;--orange:#e8852e;--text:#e8edf3;--muted:#8899b0;--border:#2a3f5e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--navy);color:var(--text);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;line-height:1.6;min-height:100vh}
+nav{background:var(--steel);border-bottom:2px solid var(--accent);position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;padding:0 24px;height:56px;gap:32px}
+.nav-logo{font-weight:700;font-size:16px;color:var(--accent);letter-spacing:.5px;white-space:nowrap}
+.nav-links{display:flex;gap:4px}
+.nav-links button{background:none;border:none;color:var(--muted);padding:8px 16px;border-radius:6px;font-size:14px;cursor:pointer;transition:.2s;font-family:inherit}
+.nav-links button:hover,.nav-links button.active{color:#fff;background:rgba(59,143,194,.15)}
+main{max-width:1100px;margin:0 auto;padding:48px 24px}
+.page{display:none}
+.page.active{display:block}
+/* manual */
+.hero{display:flex;gap:48px;align-items:center;margin-bottom:64px;flex-wrap:wrap}
+.hero-text{flex:1;min-width:280px}
+.hero-text h1{font-size:36px;font-weight:800;line-height:1.2;margin-bottom:12px}
+.hero-text h1 span{color:var(--accent)}
+.hero-text .sub{color:var(--muted);font-size:16px;margin-bottom:24px;border-left:3px solid var(--accent);padding-left:16px}
+.hero-visual{flex:1;min-width:280px;display:flex;justify-content:center}
+.hero-visual svg{width:100%;max-width:400px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
+.tag{background:var(--steel);border:1px solid var(--border);padding:4px 12px;border-radius:4px;font-size:12px;color:var(--muted)}
+.tag.accent{border-color:var(--accent);color:var(--accent)}
+section{margin-bottom:48px}
+section h2{font-size:22px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+section h2::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+section h3{font-size:16px;font-weight:600;margin:16px 0 8px;color:var(--accent)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--steel);border:1px solid var(--border);border-radius:8px;padding:20px;transition:.2s}
+.card:hover{border-color:var(--accent)}
+.card .icon{width:40px;height:40px;background:rgba(59,143,194,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:20px}
+.card h4{font-size:15px;margin-bottom:6px}
+.card p{font-size:13px;color:var(--muted);line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--steel);color:var(--accent);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+td{color:var(--text)}
+tr:hover td{background:rgba(59,143,194,.05)}
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px}
+.step p{font-size:14px;color:var(--muted)}
+/* specs */
+h1{font-size:28px;font-weight:800;margin-bottom:8px}
+h1 span{color:var(--accent)}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:40px}
+.spec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.spec-card{background:var(--steel);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.spec-card h3{background:rgba(59,143,194,.1);padding:10px 16px;font-size:13px;font-weight:600;color:var(--accent);border-bottom:1px solid var(--border);letter-spacing:.5px}
+.spec-card .body{padding:12px 16px}
+.spec-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(42,63,94,.5)}
+.spec-row:last-child{border-bottom:none}
+.spec-row .lbl{color:var(--muted)}
+.spec-row .val{color:var(--text);font-weight:500}
+.pin-table th,.pin-table td{padding:8px 12px;font-size:13px}
+.pin-table .pin{font-family:'SF Mono',monospace;color:var(--orange);font-weight:600}
+.pin-table .func{color:var(--text)}
+.pin-table .desc{color:var(--muted);font-size:12px}
+.alert{background:rgba(232,133,46,.08);border:1px solid var(--orange);border-radius:8px;padding:16px;font-size:13px;color:var(--muted);margin-bottom:24px}
+.alert strong{color:var(--orange)}
+pre{font-size:12px;color:var(--muted);line-height:1.7;overflow-x:auto}
+/* apps */
+.flow{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.flow-node{background:var(--steel);border:1px solid var(--border);border-radius:8px;padding:14px 22px;text-align:center;min-width:120px;flex:1}
+.flow-node .num{color:var(--accent);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.flow-node p{font-size:13px;color:var(--text);font-weight:500}
+.flow-arrow{display:flex;align-items:center;color:var(--muted);font-size:20px}
+.case{display:flex;gap:28px;align-items:center;flex-wrap:wrap;margin-bottom:36px;background:var(--steel);border:1px solid var(--border);border-radius:8px;padding:24px}
+.case:last-child{margin-bottom:0}
+.case-text{flex:1;min-width:250px}
+.case-number{color:var(--accent);font-size:12px;font-weight:600;letter-spacing:1px;margin-bottom:6px}
+.case-text h3{font-size:17px;margin-bottom:8px}
+.case-text p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.case-text ul{list-style:none;padding:0}
+.case-text ul li{font-size:13px;color:var(--muted);padding:3px 0;padding-left:16px;position:relative}
+.case-text ul li::before{content:'\25B6';position:absolute;left:0;color:var(--accent);font-size:9px}
+.case-visual{flex:1;min-width:250px;display:flex;justify-content:center}
+.case-visual svg{max-width:100%;max-height:200px}
+.use-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.use-card{background:var(--steel);border:1px solid var(--border);border-radius:8px;padding:20px;transition:.2s}
+.use-card:hover{border-color:var(--accent)}
+.use-card h4{font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.use-card p{font-size:13px;color:var(--muted);line-height:1.5}
+.arch{background:var(--steel);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center}
+.arch svg{max-width:100%}
+footer{text-align:center;padding:32px 24px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);max-width:1100px;margin:0 auto}
+footer button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-family:inherit;padding:0 6px}
+footer button:hover{text-decoration:underline}
+@media(max-width:640px){.hero-text h1{font-size:26px}.nav-inner{gap:12px;padding:0 12px}.nav-links button{padding:6px 10px;font-size:12px}.flow-arrow{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="nav-inner">
+  <div class="nav-logo">PCT-100-003</div>
+  <div class="nav-links">
+    <button onclick="switchPage('manual')" id="tab-manual" class="active">产品说明书</button>
+    <button onclick="switchPage('specs')" id="tab-specs">技术规格</button>
+    <button onclick="switchPage('apps')" id="tab-apps">应用案例</button>
+  </div>
+</div>
+</nav>
+
+<main>
+
+<!-- ==================== 产品说明书 ==================== -->
+<div class="page active" id="page-manual">
+
+<div class="hero">
+  <div class="hero-text">
+    <h1>化工控制<span>实训装置</span></h1>
+    <div class="sub">基于 ESP32-C3 的智能化工过程控制实训平台，集成 WiFi 远程监控、MQTT 物联上报与传感器闭环控制</div>
+    <div class="tags">
+      <span class="tag accent">ESP32-C3</span>
+      <span class="tag">WiFi 远程</span>
+      <span class="tag">MQTT 物联</span>
+      <span class="tag">光感控制</span>
+      <span class="tag">温度监测</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <svg viewBox="0 0 400 280" fill="none">
+      <rect x="140" y="20" width="120" height="60" rx="6" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1.5"/>
+      <text x="200" y="47" text-anchor="middle" fill="#e8edf3" font-size="11" font-family="sans-serif">ESP32-C3</text>
+      <text x="200" y="62" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">主控芯片</text>
+      <rect x="20" y="120" width="100" height="44" rx="4" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+      <text x="70" y="146" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">光照传感器</text>
+      <rect x="150" y="120" width="100" height="44" rx="4" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+      <text x="200" y="146" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">温度传感器</text>
+      <rect x="280" y="120" width="100" height="44" rx="4" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+      <text x="330" y="146" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">OLED 显示</text>
+      <rect x="60" y="200" width="100" height="44" rx="4" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+      <text x="110" y="226" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">LED 执行器</text>
+      <rect x="240" y="200" width="100" height="44" rx="4" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+      <text x="290" y="226" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">继电器（风扇）</text>
+      <line x1="140" y1="50" x2="70" y2="120" stroke="#3b8fc2" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="200" y1="80" x2="200" y2="120" stroke="#3b8fc2" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="260" y1="50" x2="330" y2="120" stroke="#3b8fc2" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="110" y1="164" x2="110" y2="200" stroke="#e8852e" stroke-width="1"/>
+      <line x1="290" y1="164" x2="290" y2="200" stroke="#e8852e" stroke-width="1"/>
+      <text x="200" y="260" text-anchor="middle" fill="#8899b0" font-size="10" font-family="sans-serif">化工控制实训装置 系统框图</text>
+    </svg>
+  </div>
+</div>
+
+<section>
+  <h2>产品概述</h2>
+  <p style="color:var(--muted);max-width:720px;font-size:15px">PCT-100-003 是一款面向化工类职业院校与实训基地的智能过程控制训练设备。以 ESP32-C3 为主控核心，集成环境感知、逻辑控制、物联网通信三大模块，帮助学生理解化工生产中的自动检测、闭环调节与远程监控原理。</p>
+</section>
+
+<section>
+  <h2>核心特性</h2>
+  <div class="card-grid">
+    <div class="card"><div class="icon">📡</div><h4>WiFi 远程控制</h4><p>板载 Web 服务器，同一局域网下手机/电脑浏览器即可访问控制面板，无需安装任何软件。</p></div>
+    <div class="card"><div class="icon">🌐</div><h4>MQTT 物联上报</h4><p>支持接入标准 MQTT Broker，设备状态实时上报，控制指令云端下发，适配工业物联网架构。</p></div>
+    <div class="card"><div class="icon">💡</div><h4>光感自动控制</h4><p>光敏电阻检测环境光照，自动调节 LED 照明，模拟化工场景中的光照闭环调节过程。</p></div>
+    <div class="card"><div class="icon">🌡️</div><h4>温度监测与散热</h4><p>DS18B20 数字温度传感器实时采集，超阈值自动启动继电器控制风扇散热。</p></div>
+    <div class="card"><div class="icon">🖥️</div><h4>OLED 本地屏显</h4><p>1.3 寸 SH1106 OLED 实时显示 WiFi 状态、系统模式、传感器数值与执行器状态。</p></div>
+    <div class="card"><div class="icon">🔌</div><h4>双按键 + RGB 指示</h4><p>总开关与辅助开关支持短按、长按组合操作；RGB LED 提供开机引导与状态指示。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>操作说明</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div><strong>上电启动</strong><p>接通 5V 电源，RGB LED 闪烁后常亮，OLED 显示系统信息</p></div></div>
+    <div class="step"><div class="step-num">2</div><div><strong>开启总开关</strong><p>K1（按键 1）按下开启系统，进入自动模式；再次按关闭</p></div></div>
+    <div class="step"><div class="step-num">3</div><div><strong>切换模式</strong><p>K2（按键 2）长按 2 秒切换自动/手动；短按循环切换 4 种手动状态</p></div></div>
+    <div class="step"><div class="step-num">4</div><div><strong>远程访问</strong><p>浏览器输入设备 IP 打开控制面板，可远程监控与操作</p></div></div>
+    <div class="step"><div class="step-num">5</div><div><strong>MQTT 接入</strong><p>通过串口配置 MQTT 服务器信息，设备自动上报状态至云端平台</p></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>手动模式状态表</h2>
+  <table>
+    <tr><th>模式</th><th>灯光</th><th>风扇</th><th>说明</th></tr>
+    <tr><td>0</td><td>OFF</td><td>OFF</td><td>全关</td></tr>
+    <tr><td>1</td><td>ON</td><td>OFF</td><td>仅灯亮</td></tr>
+    <tr><td>2</td><td>OFF</td><td>ON</td><td>仅风扇转</td></tr>
+    <tr><td>3</td><td>ON</td><td>ON</td><td>灯 + 风扇全开</td></tr>
+  </table>
+</section>
+
+</div>
+
+<!-- ==================== 技术规格 ==================== -->
+<div class="page" id="page-specs">
+
+<h1>技术<span>规格</span></h1>
+<p class="subtitle">PCT-100-003 硬件参数、引脚定义与电气特性</p>
+
+<section>
+  <h2>主控参数</h2>
+  <div class="spec-grid">
+    <div class="spec-card">
+      <h3>主控芯片</h3>
+      <div class="body">
+        <div class="spec-row"><span class="lbl">型号</span><span class="val">ESP32-C3-WROOM-02</span></div>
+        <div class="spec-row"><span class="lbl">架构</span><span class="val">RISC-V 32 位单核</span></div>
+        <div class="spec-row"><span class="lbl">主频</span><span class="val">160 MHz</span></div>
+        <div class="spec-row"><span class="lbl">SRAM</span><span class="val">400 KB</span></div>
+        <div class="spec-row"><span class="lbl">Flash</span><span class="val">4 MB</span></div>
+      </div>
+    </div>
+    <div class="spec-card">
+      <h3>无线通信</h3>
+      <div class="body">
+        <div class="spec-row"><span class="lbl">WiFi 标准</span><span class="val">802.11 b/g/n (2.4 GHz)</span></div>
+        <div class="spec-row"><span class="lbl">模式</span><span class="val">STA / AP / STA+AP</span></div>
+        <div class="spec-row"><span class="lbl">网页服务</span><span class="val">HTTP 80 端口</span></div>
+        <div class="spec-row"><span class="lbl">MQTT</span><span class="val">PubSubClient</span></div>
+        <div class="spec-row"><span class="lbl">蓝牙</span><span class="val">BLE 5.0</span></div>
+      </div>
+    </div>
+    <div class="spec-card">
+      <h3>电气参数</h3>
+      <div class="body">
+        <div class="spec-row"><span class="lbl">供电电压</span><span class="val">5V DC (USB / 排针)</span></div>
+        <div class="spec-row"><span class="lbl">工作电流</span><span class="val">~120 mA（不含外设）</span></div>
+        <div class="spec-row"><span class="lbl">逻辑电平</span><span class="val">3.3V</span></div>
+        <div class="spec-row"><span class="lbl">IO 耐受</span><span class="val">5V（部分引脚）</span></div>
+        <div class="spec-row"><span class="lbl">工作温度</span><span class="val">-40°C ~ +85°C</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>引脚定义</h2>
+  <table class="pin-table">
+    <tr><th>引脚</th><th>功能</th><th>说明</th></tr>
+    <tr><td class="pin">GPIO 0</td><td class="func">RGB LED</td><td class="desc">WS2812B 数据输入</td></tr>
+    <tr><td class="pin">GPIO 1</td><td class="func">按键 K1</td><td class="desc">总开关（外部上拉，低电平触发）</td></tr>
+    <tr><td class="pin">GPIO 2</td><td class="func">按键 K2</td><td class="desc">辅助开关（外部上拉，低电平触发）</td></tr>
+    <tr><td class="pin">GPIO 3</td><td class="func">LED 输出</td><td class="desc">模拟照明/LED 执行器</td></tr>
+    <tr><td class="pin">GPIO 4</td><td class="func">OLED SDA</td><td class="desc">SH1106 I2C 数据线</td></tr>
+    <tr><td class="pin">GPIO 5</td><td class="func">OLED SCL</td><td class="desc">SH1106 I2C 时钟线</td></tr>
+    <tr><td class="pin">GPIO 6</td><td class="func">ADC 输入</td><td class="desc">光敏电阻分压采样</td></tr>
+    <tr><td class="pin">GPIO 7</td><td class="func">DS18B20</td><td class="desc">温度传感器 1-Wire</td></tr>
+    <tr><td class="pin">GPIO 8</td><td class="func">继电器</td><td class="desc">风扇/散热执行器</td></tr>
+    <tr><td class="pin">GPIO 9</td><td class="func">UART TX</td><td class="desc">串口输出（调试/命令）</td></tr>
+    <tr><td class="pin">GPIO 10</td><td class="func">UART RX</td><td class="desc">串口输入（命令）</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>传感器参数</h2>
+  <div class="spec-grid">
+    <div class="spec-card">
+      <h3>光敏传感器</h3>
+      <div class="body">
+        <div class="spec-row"><span class="lbl">类型</span><span class="val">光敏电阻 + 分压</span></div>
+        <div class="spec-row"><span class="lbl">ADC 分辨率</span><span class="val">12 位 (0~4095)</span></div>
+        <div class="spec-row"><span class="lbl">采样率</span><span class="val">~1 kHz</span></div>
+        <div class="spec-row"><span class="lbl">阈值</span><span class="val">可软件配置</span></div>
+      </div>
+    </div>
+    <div class="spec-card">
+      <h3>DS18B20 温度传感器</h3>
+      <div class="body">
+        <div class="spec-row"><span class="lbl">接口</span><span class="val">1-Wire</span></div>
+        <div class="spec-row"><span class="lbl">测温范围</span><span class="val">-55°C ~ +125°C</span></div>
+        <div class="spec-row"><span class="lbl">精度</span><span class="val">±0.5°C (-10°C ~ +85°C)</span></div>
+        <div class="spec-row"><span class="lbl">分辨率</span><span class="val">9~12 位可配置</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>通信协议 — MQTT 主题</h2>
+  <div class="alert"><strong>注意</strong> · 设备 ID 可通过串口 <code>mqtt_id</code> 命令修改，默认值为设备序列号</div>
+  <table class="pin-table">
+    <tr><th>主题</th><th>方向</th><th>说明</th></tr>
+    <tr><td><code>chemctrl/&lt;id&gt;/status</code></td><td>发布</td><td>JSON 格式状态上报（系统、模式、传感器、执行器）</td></tr>
+    <tr><td><code>chemctrl/&lt;id&gt;/command</code></td><td>订阅</td><td>接收远程控制指令</td></tr>
+  </table>
+  <div style="margin-top:16px;background:var(--steel);border:1px solid var(--border);border-radius:8px;padding:16px">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:8px">状态上报 JSON 示例：</p>
+    <pre>{
+  "id": "PCT_100_003",
+  "system": true,
+  "auto": true,
+  "function": 0,
+  "light": 2847,
+  "temperature": 25.3,
+  "led": true,
+  "fan": false,
+  "ip": "192.168.1.100"
+}</pre>
+  </div>
+</section>
+
+</div>
+
+<!-- ==================== 应用案例 ==================== -->
+<div class="page" id="page-apps">
+
+<h1>应用<span>案例</span></h1>
+<p class="subtitle">PCT-100-003 在化工实训教学中的典型场景</p>
+
+<section>
+  <h2>实训流程</h2>
+  <div class="flow">
+    <div class="flow-node"><div class="num">STEP 1</div><p>传感器采集<br><span style="font-size:11px;color:var(--muted)">光照 · 温度</span></p></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="num">STEP 2</div><p>ESP32-C3 处理<br><span style="font-size:11px;color:var(--muted)">阈值判断 · PID</span></p></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="num">STEP 3</div><p>执行器动作<br><span style="font-size:11px;color:var(--muted)">LED · 风扇</span></p></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="num">STEP 4</div><p>远程监控<br><span style="font-size:11px;color:var(--muted)">Web · MQTT</span></p></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="num">STEP 5</div><p>数据分析<br><span style="font-size:11px;color:var(--muted)">状态追踪</span></p></div>
+  </div>
+</section>
+
+<section>
+  <h2>典型教学案例</h2>
+
+  <div class="case">
+    <div class="case-text">
+      <div class="case-number">CASE 01</div>
+      <h3>光照闭环控制实验</h3>
+      <p>模拟化工车间照明自动调节场景。环境光照变化时，光敏电阻 ADC 值实时变化，系统根据设定阈值自动切换 LED 照明，演示化工控制中最基础的开关量闭环调节原理。</p>
+      <ul>
+        <li>理解 ADC 采样 — 数字转换链路</li>
+        <li>掌握阈值比较的编程方法</li>
+        <li>观察闭环反馈的执行效果</li>
+      </ul>
+    </div>
+    <div class="case-visual">
+      <svg viewBox="0 0 280 160" fill="none">
+        <rect x="10" y="50" width="80" height="40" rx="4" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+        <text x="50" y="74" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">光敏传感器</text>
+        <rect x="120" y="50" width="80" height="40" rx="4" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+        <text x="160" y="74" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">ESP32-C3</text>
+        <rect x="230" y="20" width="45" height="30" rx="4" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+        <text x="252" y="39" text-anchor="middle" fill="#e8edf3" font-size="8" font-family="sans-serif">LED</text>
+        <line x1="90" y1="70" x2="120" y2="70" stroke="#3b8fc2" stroke-width="1"/>
+        <line x1="200" y1="70" x2="230" y2="35" stroke="#e8852e" stroke-width="1"/>
+        <text x="160" y="120" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">光照 → 采样 → 比较 → 控制</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-text">
+      <div class="case-number">CASE 02</div>
+      <h3>温度监测与散热保护</h3>
+      <p>模拟化工反应釜超温保护场景。DS18B20 实时检测环境温度，超过 28°C 阈值自动启动继电器控制风扇散热，降至 25°C 自动停止，实现滞回比较控制。</p>
+      <ul>
+        <li>掌握 1-Wire 总线数字温度读取</li>
+        <li>理解滞回比较器防止频繁切换</li>
+        <li>学习继电器驱动大功率负载方法</li>
+      </ul>
+    </div>
+    <div class="case-visual">
+      <svg viewBox="0 0 280 160" fill="none">
+        <rect x="10" y="50" width="80" height="40" rx="4" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+        <text x="50" y="67" text-anchor="middle" fill="#e8edf3" font-size="9" font-family="sans-serif">DS18B20</text>
+        <text x="50" y="81" text-anchor="middle" fill="#8899b0" font-size="8" font-family="sans-serif">温度传感器</text>
+        <rect x="120" y="50" width="80" height="40" rx="4" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+        <text x="160" y="74" text-anchor="middle" fill="#e8edf3" font-size="10" font-family="sans-serif">ESP32-C3</text>
+        <rect x="230" y="50" width="45" height="40" rx="4" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+        <text x="252" y="74" text-anchor="middle" fill="#e8edf3" font-size="9" font-family="sans-serif">风扇</text>
+        <line x1="90" y1="70" x2="120" y2="70" stroke="#3b8fc2" stroke-width="1"/>
+        <line x1="200" y1="70" x2="230" y2="70" stroke="#e8852e" stroke-width="1"/>
+        <text x="160" y="125" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">28°C 开 / 25°C 关（滞回）</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-text">
+      <div class="case-number">CASE 03</div>
+      <h3>物联网远程监控实训</h3>
+      <p>模拟化工 DCS 集散控制架构。设备通过 WiFi 连接局域网，Web 界面实时显示传感器数据；同时通过 MQTT 与上层平台通信，实现设备状态远程感知与控制指令下发。</p>
+      <ul>
+        <li>WiFi 配网与 Web 服务器搭建</li>
+        <li>MQTT 发布/订阅通信模型</li>
+        <li>JSON 数据序列化与解析</li>
+      </ul>
+    </div>
+    <div class="case-visual">
+      <svg viewBox="0 0 280 160" fill="none">
+        <rect x="100" y="20" width="80" height="36" rx="4" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+        <text x="140" y="43" text-anchor="middle" fill="#e8edf3" font-size="9" font-family="sans-serif">PCT-100-003</text>
+        <rect x="20" y="90" width="80" height="36" rx="4" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+        <text x="60" y="113" text-anchor="middle" fill="#e8edf3" font-size="9" font-family="sans-serif">Web 浏览器</text>
+        <rect x="180" y="90" width="80" height="36" rx="4" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+        <text x="220" y="113" text-anchor="middle" fill="#e8edf3" font-size="9" font-family="sans-serif">MQTT Broker</text>
+        <line x1="140" y1="56" x2="60" y2="90" stroke="#3b8fc2" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="140" y1="56" x2="220" y2="90" stroke="#e8852e" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="140" y="150" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">WiFi · HTTP · MQTT</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-text">
+      <div class="case-number">CASE 04</div>
+      <h3>自动/手动模式切换实训</h3>
+      <p>模拟化工控制系统的手/自动无扰切换。设备支持一键切换自动模式（传感器驱动）与手动模式（按键循环选择 4 种输出状态），帮助学生理解 DCS 系统操作方式。</p>
+      <ul>
+        <li>掌握状态机编程设计</li>
+        <li>理解自动与手动模式逻辑</li>
+        <li>熟悉按键去抖与长按短按识别</li>
+      </ul>
+    </div>
+    <div class="case-visual">
+      <svg viewBox="0 0 280 160" fill="none">
+        <rect x="15" y="40" width="110" height="80" rx="6" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1"/>
+        <text x="70" y="62" text-anchor="middle" fill="#e8edf3" font-size="9" font-family="sans-serif">自动模式</text>
+        <text x="70" y="80" text-anchor="middle" fill="#8899b0" font-size="8" font-family="sans-serif">传感器驱动</text>
+        <text x="70" y="94" text-anchor="middle" fill="#8899b0" font-size="8" font-family="sans-serif">自动闭环控制</text>
+        <rect x="155" y="40" width="110" height="80" rx="6" fill="#1a2d4a" stroke="#e8852e" stroke-width="1"/>
+        <text x="210" y="62" text-anchor="middle" fill="#e8edf3" font-size="9" font-family="sans-serif">手动模式</text>
+        <text x="210" y="80" text-anchor="middle" fill="#8899b0" font-size="8" font-family="sans-serif">按键选择状态</text>
+        <text x="210" y="94" text-anchor="middle" fill="#8899b0" font-size="8" font-family="sans-serif">0 · 1 · 2 · 3</text>
+        <text x="140" y="60" text-anchor="middle" fill="#8899b0" font-size="12">⇄</text>
+        <text x="140" y="145" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">长按 2 秒切换</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>适用场景</h2>
+  <div class="use-grid">
+    <div class="use-card"><h4>🏭 化工类职业院校</h4><p>配合自动化、化工仪表等专业课程，用于过程控制原理教学实验，帮助学生建立工业控制感性认识。</p></div>
+    <div class="use-card"><h4>🧪 实训基地</h4><p>作为技能竞赛训练平台，涵盖传感器、嵌入式、通信、物联网等多学科知识，支持综合实训项目。</p></div>
+    <div class="use-card"><h4>🔬 创新实验室</h4><p>开放式硬件 + 开源代码架构，支持学生二次开发，探索 PID、模糊控制等高级算法。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>系统架构</h2>
+  <div class="arch">
+    <svg viewBox="0 0 600 200" fill="none">
+      <rect x="10" y="80" width="100" height="50" rx="6" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1.5"/>
+      <text x="60" y="102" text-anchor="middle" fill="#e8edf3" font-size="11" font-family="sans-serif">感知层</text>
+      <text x="60" y="117" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">光敏 · DS18B20</text>
+      <rect x="160" y="80" width="130" height="50" rx="6" fill="#1a2d4a" stroke="#e8852e" stroke-width="1.5"/>
+      <text x="225" y="102" text-anchor="middle" fill="#e8edf3" font-size="11" font-family="sans-serif">控制层</text>
+      <text x="225" y="117" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">ESP32-C3 · 状态机</text>
+      <rect x="340" y="80" width="100" height="50" rx="6" fill="#1a2d4a" stroke="#3b8fc2" stroke-width="1.5"/>
+      <text x="390" y="102" text-anchor="middle" fill="#e8edf3" font-size="11" font-family="sans-serif">执行层</text>
+      <text x="390" y="117" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">LED · 继电器</text>
+      <rect x="490" y="80" width="100" height="50" rx="6" fill="#1a2d4a" stroke="#e8852e" stroke-width="1.5"/>
+      <text x="540" y="102" text-anchor="middle" fill="#e8edf3" font-size="11" font-family="sans-serif">传输层</text>
+      <text x="540" y="117" text-anchor="middle" fill="#8899b0" font-size="9" font-family="sans-serif">WiFi · MQTT</text>
+      <line x1="110" y1="105" x2="160" y2="105" stroke="#3b8fc2" stroke-width="1.5"/>
+      <polygon points="155,100 165,105 155,110" fill="#3b8fc2"/>
+      <line x1="290" y1="105" x2="340" y2="105" stroke="#e8852e" stroke-width="1.5"/>
+      <polygon points="335,100 345,105 335,110" fill="#e8852e"/>
+      <line x1="440" y1="105" x2="490" y2="105" stroke="#3b8fc2" stroke-width="1.5"/>
+      <polygon points="485,100 495,105 485,110" fill="#3b8fc2"/>
+      <text x="300" y="175" text-anchor="middle" fill="#8899b0" font-size="11" font-family="sans-serif">感知 → 控制 → 执行 → 传输 四位一体</text>
+    </svg>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>PCT-100-003 化工控制实训装置 &mdash; <button onclick="switchPage('manual')">产品说明书</button> · <button onclick="switchPage('specs')">技术规格</button> · <button onclick="switchPage('apps')">应用案例</button></p>
+</footer>
+
+</main>
+
+<script>
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
